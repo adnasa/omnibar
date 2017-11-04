@@ -2,7 +2,7 @@ import * as React from 'react';
 import ResultsItem from './ResultsItem';
 import { COLORS } from './constants';
 
-interface Props<T> {
+interface ResultsProps<T> {
   // the currently selected index
   selectedIndex: number;
   // list of result items
@@ -21,12 +21,10 @@ interface Props<T> {
   maxHeight?: React.CSSLength;
   // item row height
   rowHeight?: React.CSSLength;
-  // optional override container style
-  style?: React.CSSProperties;
-  // optional row override style
-  rowStyle?: React.CSSProperties;
-  // optional result renderering function
+  // result renderering function
   resultRenderer?: <T>(item: T) => React.ReactChild;
+  getRowStyle?: <T>(context?: any) => React.CSSProperties;
+  getListStyle?: <T>() => React.CSSProperties;
 }
 
 const LIST_STYLE: React.CSSProperties = {
@@ -39,9 +37,8 @@ const LIST_STYLE: React.CSSProperties = {
   backgroundColor: COLORS.WHITE,
 };
 
-export default function Results<T>(props: Props<T>) {
-  const style = { ...LIST_STYLE, ...props.style };
-
+export default function Results<T>(props: ResultsProps<T>) {
+  const style = { ...LIST_STYLE, ...props.getListStyle() };
   if (props.maxHeight) {
     style.maxHeight = props.maxHeight;
     style.borderBottomWidth = 1;
@@ -62,15 +59,20 @@ export default function Results<T>(props: Props<T>) {
     >
       {props.items.map((item, key) =>
         React.createElement(ResultsItem, {
+          // @TODO: replace the value of `key` with a proper identifier
           key,
           highlighted: props.selectedIndex === key,
           item,
-          style: props.rowStyle,
           onMouseEnter:
             props.onMouseEnterItem &&
             createHandler(props.onMouseEnterItem, key),
           onClickItem: props.onClickItem,
           resultRenderer: props.resultRenderer,
+          getRowStyle: () =>
+            props.getRowStyle({
+              isFocused: props.selectedIndex === key,
+              rowIndex: key,
+            }),
         })
       )}
     </ul>

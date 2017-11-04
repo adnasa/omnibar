@@ -8,6 +8,15 @@ declare namespace Omnibar {
   type FunctionalExtension<T> = (query: string) => Results<T>;
   type Extension<T> = FunctionalExtension<T>;
 
+  type GetStyleFunc<T> = <T>(context?: any) => React.CSSProperties;
+
+  // Row contextual style getter
+  interface GetRowStyleContext {
+    isFocused: boolean;
+    rowIndex: number;
+  }
+  type GetRowStyleFunc<T> = <T>(context?: any) => React.CSSProperties;
+
   interface Props<T> {
     // list of extensions
     extensions: Array<Omnibar.Extension<T>>;
@@ -15,30 +24,28 @@ declare namespace Omnibar {
     maxResults?: number;
     // max items to display in view
     maxViewableResults?: number;
-    // optional input placeholder text
+    // input placeholder text
     placeholder?: string;
-    // optional input bar width
+    // input bar width
     width?: number;
-    // optional input bar height
+    // input bar height
     height?: number;
-    // optional input bar style override
-    inputStyle?: React.CSSProperties;
-    // optional result item height
+    // result item height
     rowHeight?: number;
-    // optional result item style override
-    rowStyle?: React.CSSProperties;
-    // optional result list style override
-    resultStyle?: React.CSSProperties;
-    // options style on the root element
-    rootStyle?: React.CSSProperties;
-    // optional result renderering function
+    // result renderering function
     resultRenderer?: <T>(item: T) => React.ReactChild;
-    // optional action override
+    // action override
     onAction?: <T>(item: T) => void;
     // optional input delay override
     inputDelay?: number;
-    // optional default value
+    // default value
     defaultValue?: string;
+
+    // style getters
+    getInputStyle?: Omnibar.GetStyleFunc<T>;
+    getListStyle?: Omnibar.GetStyleFunc<T>;
+    getRowStyle?: Omnibar.GetRowStyleFunc<T>;
+    getWrapperStyle?: Omnibar.GetStyleFunc<T>;
   }
 
   interface State<T> {

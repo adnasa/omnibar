@@ -17,9 +17,10 @@ export default class Omnibar<T> extends React.PureComponent<
     rowHeight: 50,
     inputDelay: 100,
 
-    // style props
-    resultStyle: {},
-    rootStyle: { position: 'relative' },
+    getWrapperStyle: () => ({}),
+    getRowStyle: () => ({}),
+    getListStyle: () => ({}),
+    getInputStyle: () => ({}),
   };
 
   state: Omnibar.State<T> = {
@@ -143,12 +144,15 @@ export default class Omnibar<T> extends React.PureComponent<
       : null;
 
     return (
-      <div style={this.props.rootStyle}>
+      <div style={this.props.getWrapperStyle()}>
         {React.createElement(Input, {
           defaultValue: this.props.defaultValue,
           width: this.props.width,
           height: this.props.height,
-          style: this.props.inputStyle,
+          style: () =>
+            this.props.getInputStyle({
+              isFocused: this.state.displayResults,
+            }),
           placeholder: this.props.placeholder,
           onChange: this.handleChange,
           onKeyDown: this.handleKeyDown,
@@ -157,16 +161,19 @@ export default class Omnibar<T> extends React.PureComponent<
         })}
         {this.state.displayResults &&
           Results({
-            selectedIndex: this.state.selectedIndex,
             items: this.state.results,
-            rowHeight: this.props.rowHeight,
             maxHeight: maxHeight,
-            style: this.props.resultStyle,
-            rowStyle: this.props.rowStyle,
+            onClickItem: this.handleClickItem,
             onMouseEnterItem: this.handleMouseEnterItem,
             onMouseLeave: this.handleMouseLeave,
-            onClickItem: this.handleClickItem,
             resultRenderer: this.props.resultRenderer,
+            rowHeight: this.props.rowHeight,
+            selectedIndex: this.state.selectedIndex,
+
+            // style for results' list
+            getListStyle: this.props.getListStyle,
+            // style for each row in the results' list
+            getRowStyle: this.props.getRowStyle,
           })}
       </div>
     );

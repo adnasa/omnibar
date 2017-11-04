@@ -2,7 +2,7 @@ import * as React from 'react';
 import { COLORS } from './constants';
 import AnchorRenderer from './modifiers/anchor/AnchorRenderer';
 
-interface Props<T> {
+interface ResultsItemProps<T> {
   // the item
   item: T;
   // onMouseEnter item callback
@@ -13,10 +13,11 @@ interface Props<T> {
   onClickItem: (e: any /* Event */) => void;
   // set to true to highlight the given item
   highlighted?: boolean;
-  // optional style override
+  // style override
   style?: React.CSSProperties;
-  // optional result renderering function
+  // result renderering function
   resultRenderer?: <T>(item: T) => React.ReactChild;
+  getRowStyle?: <T>(context?: any) => React.CSSProperties;
 }
 
 interface State {
@@ -42,7 +43,7 @@ const ITEM_HOVER_STYLE: React.CSSProperties = {
 };
 
 export default class ResultRenderer<T> extends React.PureComponent<
-  Props<T>,
+  ResultsItemProps<T>,
   State
 > {
   static defaultProps = {
@@ -65,7 +66,7 @@ export default class ResultRenderer<T> extends React.PureComponent<
 
   render() {
     const item = this.props.item;
-    let style = { ...ITEM_STYLE, ...this.props.style };
+    let style = { ...ITEM_STYLE };
 
     if (this.props.highlighted || this.state.hover) {
       style = { ...style, ...ITEM_HOVER_STYLE };
@@ -75,9 +76,10 @@ export default class ResultRenderer<T> extends React.PureComponent<
       ? this.props.resultRenderer
       : AnchorRenderer;
 
+    const finalStyle = { ...style, ...this.props.getRowStyle() };
     return (
       <li
-        style={style}
+        style={finalStyle}
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
         onClick={this.props.onClickItem}
